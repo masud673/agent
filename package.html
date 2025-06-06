@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>আমাদের ইন্টারনেট প্যাকেজ</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #00bcd4;
+      --primary-dark: #0097a7;
+      --secondary-color: #ff9800;
+      --secondary-dark: #f57c00;
+      --error-color: #ff5722;
+      --dark-bg: #121212;
+      --darker-bg: #0a0a0a;
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-hover: rgba(0, 188, 212, 0.15);
+      --text-color: #ffffff;
+      --text-muted: #b0bec5;
+      --menu-bg: rgba(30, 30, 30, 0.98);
+      --header-bg: rgba(20, 20, 20, 0.9);
+      --border-color: rgba(255, 255, 255, 0.15);
+      --success-color: #4caf50;
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--dark-bg);
+      color: var(--text-color);
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* হেডার স্টাইল */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--header-bg);
+      padding: 12px 0;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .menu-container {
+      position: absolute;
+      left: 10px;
+    }
+
+    .menu-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: var(--text-color);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    .menu-icon:hover {
+      background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+    }
+
+    /* সাইডবার মেনু */
+    #menuBar {
+      height: 100vh;
+      width: 260px;
+      background-color: var(--menu-bg);
+      position: fixed;
+      top: 0;
+      left: 0;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1001;
+      padding-top: 60px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+      overflow-y: auto;
+    }
+
+    #menuBar a {
+      padding: 14px 20px;
+      text-decoration: none;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      transition: var(--transition);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    #menuBar a i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    #menuBar a:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--primary-color);
+      padding-left: 25px;
+    }
+
+    #closeBtn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.3rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 5px;
+    }
+
+    #closeBtn:hover {
+      color: var(--error-color);
+    }
+
+    #menuBar.open {
+      transform: translateX(0);
+    }
+
+    /* ওভারলে */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    #overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* কনফার্মেশন ডায়ালগ */
+    .confirm-dialog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1002;
+    }
+
+    .dialog-content {
+      background: var(--menu-bg);
+      padding: 25px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .dialog-message {
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+      color: var(--text-color);
+    }
+
+    .dialog-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .dialog-btn {
+      padding: 10px 25px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .cancel-btn {
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+
+    .confirm-btn {
+      background: var(--error-color);
+      color: white;
+    }
+
+    .cancel-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .confirm-btn:hover {
+      background: #e53935;
+    }
+
+    /* মূল কন্টেন্ট */
+    .container {
+      width: 100%;
+      margin-top: 70px;
+      padding: 15px;
+    }
+
+    .package-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .package-box {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 15px;
+      transition: var(--transition);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .package-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+
+    .package-box:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 188, 212, 0.2);
+    }
+
+    .package-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .price-highlight {
+      color: var(--secondary-color);
+      font-weight: bold;
+      font-size: 1rem;
+      background: rgba(255, 152, 0, 0.1);
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+
+    .package-details {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 10px 0;
+    }
+
+    .package-details i {
+      margin-right: 8px;
+      color: var(--primary-color);
+      width: 16px;
+      text-align: center;
+    }
+
+    .package-features {
+      margin: 10px 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .package-features li {
+      padding: 5px 0;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .package-features i {
+      margin-right: 8px;
+      color: var(--success-color);
+      font-size: 0.8rem;
+    }
+
+    .package-appropriate {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 20px 15px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+    }
+
+    /* ট্যাবলেট এবং ডেস্কটপের জন্য রেস্পন্সিভ স্টাইল */
+    @media (min-width: 600px) {
+      .header {
+        font-size: 1.3rem;
+        padding: 15px 0;
+      }
+      
+      .container {
+        width: 95%;
+        max-width: 1200px;
+        margin: 80px auto 0;
+        padding: 20px;
+      }
+      
+      .package-container {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+      
+      .package-box {
+        padding: 18px;
+      }
+      
+      .package-title {
+        font-size: 1.2rem;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .package-container {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- হেডার -->
+<div class="header">
+  <div class="menu-container">
+    <div class="menu-icon" id="menuIcon">
+      <i class="fas fa-bars"></i>
+    </div>
+  </div>
+  আমাদের ইন্টারনেট প্যাকেজ
+</div>
+
+<!-- সাইডবার মেনু -->
+<div id="menuBar">
+  <div id="closeBtn"><i class="fas fa-times"></i></div>
+  <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+  <a href="package.html"><i class="fas fa-wifi"></i> Package</a>
+  <a href="#" class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<!-- ওভারলে -->
+<div id="overlay"></div>
+
+<!-- কনফার্মেশন ডায়ালগ -->
+<div id="confirmDialog" class="confirm-dialog">
+  <div class="dialog-content">
+    <div class="dialog-message">আপনি কি লগআউট করতে চান?</div>
+    <div class="dialog-buttons">
+      <button id="cancelLogout" class="dialog-btn cancel-btn">বাতিল</button>
+      <button id="confirmLogout" class="dialog-btn confirm-btn">লগআউট</button>
+    </div>
+  </div>
+</div>
+
+<!-- মূল কন্টেন্ট -->
+<div class="container">
+  <div class="package-container">
+
+    <div class="package-box">
+      <div class="package-title">10 Mbps <span class="price-highlight">৫০০৳/মাস</span></div>
+      <div class="package-details">
+        <div><i class="fas fa-tachometer-alt"></i> স্পিড: 10 Mbps</div>
+        <div><i class="fas fa-database"></i> ডাটা: আনলিমিটেড</div>
+      </div>
+      <ul class="package-features">
+        <li><i class="fas fa-check"></i> ইউটিউব: 60 Mbps</li>
+        <li><i class="fas fa-check"></i> ফেসবুক: 60 Mbps</li>
+        <li><i class="fas fa-check"></i> বিডিআইএক্স: 60 Mbps</li>
+      </ul>
+      <div class="package-appropriate">
+        <strong>উপযুক্ত:</strong> সাধারণ ব্রাউজিং ও সোশ্যাল মিডিয়া<br>
+        <strong>ডিভাইস:</strong> ৪-৫ টি
+      </div>
+    </div>
+
+    <div class="package-box">
+      <div class="package-title">12 Mbps <span class="price-highlight">৫৫০৳/মাস</span></div>
+      <div class="package-details">
+        <div><i class="fas fa-tachometer-alt"></i> স্পিড: 12 Mbps</div>
+        <div><i class="fas fa-database"></i> ডাটা: আনলিমিটেড</div>
+      </div>
+      <ul class="package-features">
+        <li><i class="fas fa-check"></i> ইউটিউব: 65 Mbps</li>
+        <li><i class="fas fa-check"></i> ফেসবুক: 65 Mbps</li>
+        <li><i class="fas fa-check"></i> বিডিআইএক্স: 65 Mbps</li>
+      </ul>
+      <div class="package-appropriate">
+        <strong>উপযুক্ত:</strong> HD স্ট্রিমিং ও সাধারণ ব্রাউজিং<br>
+        <strong>ডিভাইস:</strong> ৫-৬ টি
+      </div>
+    </div>
+
+    <div class="package-box">
+      <div class="package-title">15 Mbps <span class="price-highlight">৬০০৳/মাস</span></div>
+      <div class="package-details">
+        <div><i class="fas fa-tachometer-alt"></i> স্পিড: 15 Mbps</div>
+        <div><i class="fas fa-database"></i> ডাটা: আনলিমিটেড</div>
+      </div>
+      <ul class="package-features">
+        <li><i class="fas fa-check"></i> ইউটিউব: 70 Mbps</li>
+        <li><i class="fas fa-check"></i> ফেসবুক: 70 Mbps</li>
+        <li><i class="fas fa-check"></i> বিডিআইএক্স: 70 Mbps</li>
+      </ul>
+      <div class="package-appropriate">
+        <strong>উপযুক্ত:</strong> অফিস কাজ ও ভিডিও কল<br>
+        <strong>ডিভাইস:</strong> ৫-৭ টি
+      </div>
+    </div>
+
+    <div class="package-box">
+      <div class="package-title">20 Mbps <span class="price-highlight">৭০০৳/মাস</span></div>
+      <div class="package-details">
+        <div><i class="fas fa-tachometer-alt"></i> স্পিড: 20 Mbps</div>
+        <div><i class="fas fa-database"></i> ডাটা: আনলিমিটেড</div>
+      </div>
+      <ul class="package-features">
+        <li><i class="fas fa-check"></i> ইউটিউব: 80 Mbps</li>
+        <li><i class="fas fa-check"></i> ফেসবুক: 80 Mbps</li>
+        <li><i class="fas fa-check"></i> বিডিআইএক্স: 80 Mbps</li>
+      </ul>
+      <div class="package-appropriate">
+        <strong>উপযুক্ত:</strong> গেমিং ও HD স্ট্রিমিং<br>
+        <strong>ডিভাইস:</strong> ৭-১০ টি
+      </div>
+    </div>
+
+    <div class="package-box">
+      <div class="package-title">25 Mbps <span class="price-highlight">৯০০৳/মাস</span></div>
+      <div class="package-details">
+        <div><i class="fas fa-tachometer-alt"></i> স্পিড: 25 Mbps</div>
+        <div><i class="fas fa-database"></i> ডাটা: আনলিমিটেড</div>
+      </div>
+      <ul class="package-features">
+        <li><i class="fas fa-check"></i> ইউটিউব: 100 Mbps</li>
+        <li><i class="fas fa-check"></i> ফেসবুক: 100 Mbps</li>
+        <li><i class="fas fa-check"></i> বিডিআইএক্স: 100 Mbps</li>
+      </ul>
+      <div class="package-appropriate">
+        <strong>উপযুক্ত:</strong> আলট্রা HD স্ট্রিমিং<br>
+        <strong>ডিভাইস:</strong> ১০-১২ টি
+      </div>
+    </div>
+
+    <div class="package-box">
+      <div class="package-title">30 Mbps <span class="price-highlight">১০০০৳/মাস</span></div>
+      <div class="package-details">
+        <div><i class="fas fa-tachometer-alt"></i> স্পিড: 30 Mbps</div>
+        <div><i class="fas fa-database"></i> ডাটা: আনলিমিটেড</div>
+      </div>
+      <ul class="package-features">
+        <li><i class="fas fa-check"></i> ইউটিউব: 100 Mbps</li>
+        <li><i class="fas fa-check"></i> ফেসবুক: 100 Mbps</li>
+        <li><i class="fas fa-check"></i> বিডিআইএক্স: 100 Mbps</li>
+      </ul>
+      <div class="package-appropriate">
+        <strong>উপযুক্ত:</strong> ভারী ডাউনলোড<br>
+        <strong>ডিভাইস:</strong> ১২-১৫ টি
+      </div>
+    </div>
+
+    <div class="package-box">
+      <div class="package-title">40 Mbps <span class="price-highlight">১২০০৳/মাস</span></div>
+      <div class="package-details">
+        <div><i class="fas fa-tachometer-alt"></i> স্পিড: 40 Mbps</div>
+        <div><i class="fas fa-database"></i> ডাটা: আনলিমিটেড</div>
+      </div>
+      <ul class="package-features">
+        <li><i class="fas fa-check"></i> ইউটিউব: Unlimited</li>
+        <li><i class="fas fa-check"></i> ফেসবুক: Unlimited</li>
+        <li><i class="fas fa-check"></i> বিডিআইএক্স: Unlimited</li>
+      </ul>
+      <div class="package-appropriate">
+        <strong>উপযুক্ত:</strong> ব্যবসা ও পাওয়ার ইউজার<br>
+        <strong>ডিভাইস:</strong> ১৫+ টি
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2025 MASUD TELECOM. All Rights Reserved.</p>
+</footer>
+
+<script>
+  // মেনু টগল ফাংশনালিটি
+  document.addEventListener("DOMContentLoaded", function() {
+    const menuIcon = document.getElementById('menuIcon');
+    const closeBtn = document.getElementById('closeBtn');
+    const menuBar = document.getElementById('menuBar');
+    const overlay = document.getElementById('overlay');
+    
+    function toggleMenu() {
+      menuBar.classList.toggle('open');
+      overlay.classList.toggle('show');
+      document.body.style.overflow = menuBar.classList.contains('open') ? 'hidden' : 'auto';
+    }
+    
+    menuIcon.addEventListener('click', toggleMenu);
+    closeBtn.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
+
+    // লগআউট ফাংশনালিটি
+    const logoutBtn = document.getElementById('logoutBtn');
+    const confirmDialog = document.getElementById('confirmDialog');
+    const cancelLogout = document.getElementById('cancelLogout');
+    const confirmLogout = document.getElementById('confirmLogout');
+    
+    logoutBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      confirmDialog.style.display = 'flex';
+    });
+    
+    cancelLogout.addEventListener('click', function() {
+      confirmDialog.style.display = 'none';
+    });
+    
+    confirmLogout.addEventListener('click', function() {
+      // সেশন ডাটা ক্লিয়ার
+      localStorage.removeItem('sessionData');
+      localStorage.removeItem('sessionExpiry');
+      window.location.href = 'index.html';
+    });
+  });
+
+  // ব্যাক বাটন প্রতিরোধ
+  window.history.pushState(null, "", window.location.href);
+  window.onpopstate = function () {
+    window.location.href = "index.html";
+  };
+</script>
+
+</body>
+</html>

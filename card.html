@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* ========== গুগল ফন্ট আমদানি ========== */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
+
+        /* ========== সাধারণ স্টাইল ========== */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --error-color: #e74c3c;
+            --dark-bg: #0d0d0d;
+            --card-bg: #1f1f1f;
+            --text-color: #e0e0e0;
+            --text-muted: rgba(224, 224, 224, 0.7);
+            --menu-bg: rgba(40, 40, 40, 0.95);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            line-height: 1.6;
+        }
+
+        /* ব্লার ইফেক্ট ক্লাস */
+        .blur-effect {
+            filter: blur(5px);
+            transition: filter 0.3s ease;
+        }
+
+        /* ========== কার্ড কন্টেইনার ========== */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            padding: 12px;
+            margin: 0 auto;
+            max-width: 1400px;
+        }
+
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+        }
+
+        /* ========== কার্ড স্টাইল ========== */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            transform: translateY(0);
+            opacity: 0;
+            animation: fadeInUp 0.5s forwards;
+        }
+
+        .card:hover {
+            transform: translateY(-3px) !important;
+            background-color: #2c2c2c;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== সিরিয়াল নাম্বার ========== */
+        .serial {
+            width: 30px;
+            height: 30px;
+            background-color: rgba(52, 152, 219, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--primary-color);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover .serial {
+            background-color: rgba(52, 152, 219, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* ========== ইউজার ফটো ========== */
+        .userPhoto {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            object-fit: cover;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            background-color: #2c2c2c;
+            cursor: pointer;
+        }
+
+        .card:hover .userPhoto {
+            border-color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        /* ========== নাম ও ঠিকানা ========== */
+        .name-address {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.3s;
+        }
+
+        .card:hover .name {
+            color: var(--primary-color);
+        }
+
+        .user-address {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ========== হেডার ========== */
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 12px 15px;
+            background-color: #1a1a1a;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 12px;
+            }
+        }
+
+        /* ========== সার্চ কন্টেইনার ========== */
+        .search-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* ========== ইনপুট ফিল্ড ========== */
+        .header input, #areaSelect, #ponSelect {
+            padding: 5px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            background-color: #444;
+            color: #fff;
+            margin-right: 10px;
+        }
+
+        .header input {
+            width: 200px;
+        }
+
+        .header input:focus {
+            border-color: #0099ff;
+            box-shadow: 0 0 5px rgba(0, 153, 255, 0.5);
+        }
+
+        /* মোবাইলের জন্য ইনপুট ও সিলেক্ট অপশন */
+        @media (max-width: 768px) {
+            .header input {
+                width: 80%;
+                font-size: 14px;
+            }
+            #areaSelect {
+                width: 35%;
+                font-size: 14px;
+            }
+        }
+
+        /* ========== এরিয়া সিলেক্ট অপশন ========== */
+        #areaSelect, () {
+            padding: 5px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            width: 100px;
+            background-color: #444;
+            color: #fff;
+            margin-right: 10px;
+        }
+
+        /* ========== মোবাইল স্ক্রিনে এরিয়া সিলেক্ট ফিল্ড ========== */
+        @media (max-width: 768px) {
+            #areaSelect {
+                width: 35%;
+                font-size: 14px;
+            }
+        }
+
+        /* ========== মোবাইল স্ক্রিনে PON সিলেক্ট ফিল্ড ========== */
+        @media (max-width: 768px) {
+            #ponSelect {
+                width: 25%;
+                font-size: 14px;
+            }
+        }
+
+        /* ========== মেনু কন্টেইনার ও মেনু আইকন ========== */
+        .menu-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .menu-icon {
+            width: 38px;
+            height: 38px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .menu-icon:hover {
+            background-color: #2980b9;
+            transform: rotate(90deg);
+        }
+
+        .menu-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-left: 10px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .menu-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .menu-name {
+                font-size: 18px;
+            }
+        }
+
+        /* ========== সাইডবার ========== */
+        #menuBar {
+            width: 260px;
+            background-color: var(--menu-bg);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: -260px;
+            height: 100vh;
+            transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+            z-index: 1000;
+            box-shadow: 5px 0 20px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            padding-top: 60px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #menuBar.open {
+            left: 0;
+        }
+
+        #menuBar a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            font-size: 15px;
+            color: #e0e0e0;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            margin: 0 8px;
+            border-radius: 6px;
+        }
+
+        #menuBar a:hover {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        #menuBar a i {
+            margin-right: 10px;
+            width: 18px;
+            text-align: center;
+        }
+
+        #closeBtn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 22px;
+            color: #bdc3c7;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        #closeBtn:hover {
+            color: #fff;
+            background: rgba(231, 76, 60, 0.2);
+            transform: rotate(90deg);
+        }
+
+        /* ========== পপআপ ডিজাইন ========== */
+        #detailsContainer {
+            background: var(--card-bg);
+            color: var(--text-color);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            z-index: 1100;
+            width: 90%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #detailsContainer.show {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        #userPhoto {
+            width: 120px;
+            height: 120px;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        #userPhoto:hover {
+            transform: scale(1.05);
+            border-color: var(--secondary-color);
+        }
+
+        .user-details {
+            margin-top: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        .detail-row:hover {
+            border-bottom-color: var(--primary-color);
+        }
+
+        .detail-label {
+            font-weight: bold;
+            width: 100px;
+            color: var(--primary-color);
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .detail-value {
+            flex-grow: 1;
+            word-break: break-word;
+            font-size: 14px;
+        }
+
+        /* ক্লোজ বাটন পপআপ */
+        #closePopupBtn {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+            margin: 20px auto 0;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: block;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        #closePopupBtn:hover {
+            background: var(--error-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+        }
+
+        /* লোডিং এবং এরর স্টাইল */
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--primary-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        /* ওভারলে স্টাইল */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
+        /* মোবাইল মেনু বাটন অ্যানিমেশন */
+        .menu-icon .bar {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: white;
+            margin: 4px 0;
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon.open .bar:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+        }
+
+        .menu-icon.open .bar:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-icon.open .bar:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+
+        /* কার্ড স্ট্যাগার অ্যানিমেশন */
+        @media (min-width: 768px) {
+            .card:nth-child(odd) {
+                animation-delay: 0.1s;
+            }
+            .card:nth-child(3n) {
+                animation-delay: 0.2s;
+            }
+        }
+
+        /* স্ক্রলবার স্টাইল */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+
+        /* ========== কপি বাটন স্টাইল ========== */
+        .copy-btn {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            margin-left: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* কপি নোটিফিকেশন */
+        .copy-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1200;
+        }
+
+        .copy-notification.show {
+            opacity: 1;
+        }
+
+        /* ডিটেইল ভ্যালু কন্টেইনার */
+        .value-container {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        /* ফটো কপি টুলটিপ */
+        .photo-copy-tooltip {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        #userPhoto:hover .photo-copy-tooltip {
+            opacity: 1;
+        }
+        
+    /* ... existing styles ... */
+
+    /* পেজিনেশন কন্ট্রোল স্টাইল */
+    .pagination-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin: 20px 0;
+        padding: 10px 0;
+    }
+
+    .pagination-controls button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 15px;
+        cursor: pointer;
+        font-family: 'Noto Sans Bengali', sans-serif;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .pagination-controls button:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+    }
+
+    .pagination-controls button:disabled {
+        background-color: #7f8c8d;
+        cursor: not-allowed;
+    }
+
+    .pagination-controls span {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+    /* কনফার্মেশন ডায়ালগ স্টাইল */
+.confirm-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.confirm-dialog-box {
+  background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);  padding: 25px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.confirm-dialog-message {
+  font-size: 18px;
+  margin-bottom: 25px;
+  color: #fff;
+}
+
+.confirm-dialog-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.confirm-dialog-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.confirm-dialog-cancel {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.confirm-dialog-cancel:hover {
+  background: #e0e0e0;
+}
+
+.confirm-dialog-confirm {
+  background: #ff4757;
+  color: white;
+}
+
+.confirm-dialog-confirm:hover {
+  background: #ff6b81;
+}
+ 
+    </style>
+</head>
+<body>
+
+    <!-- ওভারলে -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- হেডার -->
+    <header class="header">
+        <div class="menu-container">
+                <div class="menu-icon" id="menuIcon">&#9776;</div>
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            
+            <span class="menu-name">MASUD TELECOM</span>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="নাম, ফোন বা ইউজারনেম দিয়ে খুঁজুন..." />
+            <select id="areaSelect">
+                <option value="">সব এলাকা</option>
+            </select>
+        </div>
+    </header>
+
+<div id="menuBar">
+  <div id="closeBtn">&#10006;</div>
+  <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+  <a href="package.html"><i class="fas fa-wifi"></i> Package</a>
+  <a href="#" class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+    </div>
+    <!-- লগআউট কনফার্মেশন ডায়ালগ HTML -->
+<div id="confirmDialog" class="confirm-dialog-overlay">
+  <div class="confirm-dialog-box">
+    <p class="confirm-dialog-message">Are you sure you want to logout?</p>
+    <div class="confirm-dialog-buttons">
+      <button id="cancelLogout" class="confirm-dialog-btn confirm-dialog-cancel">Cancel</button>
+      <button id="confirmLogout" class="confirm-dialog-btn confirm-dialog-confirm">Logout</button>
+    </div>
+  </div>
+</div>
+
+    <!-- কার্ড কন্টেইনার -->
+    <div class="card-container" id="cardContainer">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">ডেটা লোড হচ্ছে...</div>
+    </div>
+
+    <!-- পপআপ -->
+    <div id="detailsContainer">
+        <div style="text-align: center; position: relative;">
+            <img src="" id="userPhoto" alt="User">
+            <div class="photo-copy-tooltip">ক্লিক করে নাম, আইডি ও ইউজারনেম কপি করুন</div>
+        </div>
+        <div class="user-details" id="userDetails">
+            <!-- ডিটেইলস ডাইনামিকভাবে যোগ হবে -->
+        </div>
+        <div style="text-align: center;">
+            <button id="closePopupBtn">X</button>
+        </div>
+    </div>
+
+    <!-- কপি নোটিফিকেশন -->
+    <div id="copyNotification" class="copy-notification">কপি করা হয়েছে!</div>
+    
+<script>
+
+// গ্লোবাল ভেরিয়েবল
+let userData = [];
+let additionalData = [];
+let filteredData = [];
+let filterTimer;
+let currentPopupUser = null;
+let currentPage = 1;
+const itemsPerPage = 50;
+
+// ডকুমেন্ট রেডি ইভেন্ট
+document.addEventListener('DOMContentLoaded', function() {
+    initApp();
+});
+
+async function initApp() {
+
+    // ইভেন্ট লিসেনার সেটআপ
+    setupEventListeners();
+    
+    // ডেটা লোড
+    try {
+        showLoading();
+        await Promise.all([loadCSVData(), loadAdditionalData()]);
+        checkNetworkStatus();
+    } catch (error) {
+        showError('ডেটা লোড ব্যর্থ: ' + error.message);
+    }
+}
+
+function setupEventListeners() {
+    document.getElementById('menuIcon').addEventListener('click', toggleMenu);
+    document.getElementById('closeBtn').addEventListener('click', closeMenu);
+    document.getElementById('closePopupBtn').addEventListener('click', closePopup);
+    document.getElementById('overlay').addEventListener('click', handleOverlayClick);
+    document.getElementById('searchInput').addEventListener('input', debounceFilter);
+    document.getElementById('areaSelect').addEventListener('change', debounceFilter);
+    document.addEventListener('keydown', handleKeyDown);
+}
+
+// মেনু ফাংশনসমূহ
+function toggleMenu() {
+    const menuIcon = document.getElementById('menuIcon');
+    const menuBar = document.getElementById('menuBar');
+    const overlay = document.getElementById('overlay');
+    
+    menuIcon.classList.toggle('open');
+    menuBar.classList.toggle('open');
+    overlay.classList.toggle('show');
+    document.body.style.overflow = menuBar.classList.contains('open') ? 'hidden' : 'auto';
+}
+
+function closeMenu() {
+    document.getElementById('menuIcon').classList.remove('open');
+    document.getElementById('menuBar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+    document.body.style.overflow = 'auto';
+}
+
+// ডেটা লোডিং ফাংশনসমূহ
+async function loadCSVData() {
+    try {
+        const url = 'https://raw.githubusercontent.com/masud673/masud/main/data.csv';
+
+        const response = await fetch(url);
+        const csvData = await response.text();
+        userData = processCSVData(csvData);
+        filteredData = [...userData];
+        renderCards();
+
+    } catch (error) {
+        handleDataError(error);
+    }
+}
+
+// ডেটা প্রসেসিং ফাংশন
+function processCSVData(csvData) {
+    const lines = csvData.split('\n');
+    const headers = lines[0].split(',').map(header => header.trim());
+    const data = [];
+    const areaSet = new Set();
+
+    for (let i = 1; i < lines.length; i++) {
+        if (lines[i].trim() === '') continue;
+        const values = lines[i].split(',');
+        const user = {};
+        
+        for (let j = 0; j < headers.length; j++) {
+            user[headers[j]] = (j < values.length) ? values[j].trim() : 'N/A';
+        }
+        
+        if (!user['NAME'] || !user['Username']) continue;
+        
+        if (user['ADDRESS']) areaSet.add(user['ADDRESS']);
+        data.push(user);
+    }
+
+    populateDropdown('areaSelect', areaSet, 'সব এলাকা');
+    
+    return data;
+}
+
+function processAdditionalCSVData(csvData) {
+    const lines = csvData.split('\n');
+    const headers = lines[0].split(',').map(header => header.trim());
+    const data = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+        if (lines[i].trim() === '') continue;
+        const values = lines[i].split(',');
+        const entry = {};
+        headers.forEach((header, j) => {
+            entry[header] = values[j] ? values[j].trim() : 'N/A';
+        });
+        data.push(entry);
+    }
+    return data;
+}
+
+// UI ফাংশনসমূহ
+function populateDropdown(id, dataSet, defaultText) {
+    const select = document.getElementById(id);
+    select.innerHTML = `<option value="">${defaultText}</option>`;
+    Array.from(dataSet).sort().forEach(item => {
+        const option = document.createElement('option');
+        option.value = item;
+        option.textContent = item;
+        select.appendChild(option);
+    });
+}
+
+function debounceFilter() {
+    clearTimeout(filterTimer);
+    filterTimer = setTimeout(() => {
+        currentPage = 1;
+        filterUsers();
+    }, 300);
+}
+
+function filterUsers() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const areaFilter = document.getElementById('areaSelect').value;
+    
+    filteredData = userData.filter(user => {
+        const nameMatch = user['NAME']?.toLowerCase().includes(searchTerm);
+        const phoneMatch = user['PHONE NUMBER']?.includes(searchTerm);
+        const usernameMatch = user['Username']?.toLowerCase().includes(searchTerm);
+        const areaMatch = !areaFilter || user['ADDRESS'] === areaFilter;
+        
+        return (nameMatch || phoneMatch || usernameMatch) && areaMatch;
+    });
+    
+    renderCards();
+}
+
+
+
+function renderCards() {
+    const cardContainer = document.getElementById('cardContainer');
+    cardContainer.innerHTML = '';
+    
+    if (!filteredData || filteredData.length === 0) {
+        cardContainer.innerHTML = '<div class="error-message">কোনো ইউজার পাওয়া যায়নি</div>';
+        return;
+    }
+    
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+    const areaSelect = document.getElementById('areaSelect');
+    const isAllAreasSelected = areaSelect.value === '';
+    
+    paginatedData.forEach((user, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.animationDelay = `${index * 0.05}s`;
+        card.onclick = () => showPopup(user);
+        
+        const username = user['Username'] || 'N/A';
+        const photoUrl = getPhotoUrl(username);
+        
+        // সিরিয়াল নাম্বার লজিক পরিবর্তন
+        let serialNumber;
+        if (isAllAreasSelected) {
+            // সব এলাকা সিলেক্ট থাকলে মূল ডাটার ইনডেক্স ব্যবহার
+            serialNumber = userData.findIndex(u => u['Username'] === user['Username']) + 1;
+        } else {
+            // নির্দিষ্ট এলাকা সিলেক্ট থাকলে ফিল্টার্ড ডাটার ইনডেক্স ব্যবহার
+            serialNumber = startIndex + index + 1;
+        }
+        
+        card.innerHTML = `
+            <div class="serial">${serialNumber.toString().padStart(2, '0')}</div>
+            <img src="${photoUrl}" 
+                 onerror="this.onerror=null;this.src='https://via.placeholder.com/150?text=User'" 
+                 alt="${user['NAME'] || 'User'}" 
+                 class="userPhoto"
+                 loading="lazy">
+            <div class="name-address">
+                <div class="name">${user['NAME'] || 'N/A'}</div>
+                <div class="user-address">ঠিকানা: ${user['ADDRESS'] || 'N/A'}</div>
+            </div>
+        `;
+        
+        cardContainer.appendChild(card);
+    });
+
+    addPaginationControls();
+}
+
+
+function addPaginationControls() {
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    if (totalPages <= 1) return;
+
+    const paginationDiv = document.createElement('div');
+    paginationDiv.className = 'pagination-controls';
+    
+    if (currentPage > 1) {
+        const prevBtn = document.createElement('button');
+        prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> পূর্বের পাতা';
+        prevBtn.onclick = () => {
+            currentPage--;
+            renderCards();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
+        paginationDiv.appendChild(prevBtn);
+    }
+    
+    const pageInfo = document.createElement('span');
+    pageInfo.textContent = `পাতা ${currentPage} / ${totalPages}`;
+    paginationDiv.appendChild(pageInfo);
+    
+    if (currentPage < totalPages) {
+        const nextBtn = document.createElement('button');
+        nextBtn.innerHTML = 'পরের পাতা <i class="fas fa-chevron-right"></i>';
+        nextBtn.onclick = () => {
+            currentPage++;
+            renderCards();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        };
+        paginationDiv.appendChild(nextBtn);
+    }
+    
+    document.getElementById('cardContainer').appendChild(paginationDiv);
+}
+
+// পপআপ ফাংশনসমূহ
+function showPopup(user) {
+    if (currentPopupUser !== null) return;
+    
+    currentPopupUser = user;
+    const popup = document.getElementById('detailsContainer');
+    const overlay = document.getElementById('overlay');
+    const photoElement = document.getElementById('userPhoto');
+    const detailsContainer = document.getElementById('userDetails');
+    
+    const additionalInfo = additionalData.find(item => 
+        item.USERNAME && user.Username && 
+        item.USERNAME.toLowerCase() === user.Username.toLowerCase()
+    ) || {};
+    
+    photoElement.src = getPhotoUrl(user['Username']);
+    photoElement.onerror = function() {
+        this.onerror = null;
+        this.src = 'https://via.placeholder.com/150?text=User';
+        this.style.borderColor = 'var(--error-color)';
+    };
+    
+    photoElement.onclick = function(e) {
+        e.stopPropagation();
+        copyToClipboard(`${user['NAME']}\n${user['ID']}\n${user['Username']}`);
+    };
+    
+    detailsContainer.innerHTML = '';
+    const fields = [
+        {label: 'নাম:', key: 'NAME', id: 'userName'},
+        {label: 'ফোন নম্বর:', key: 'PHONE NUMBER', id: 'userPhone'},
+        {label: 'আইডি:', key: 'ID', id: 'userId'},
+        {label: 'ঠিকানা:', key: 'ADDRESS', id: 'userAddress'},
+        {label: 'ইউজারনেম:', key: 'Username', id: 'userUsername'},
+        {label: 'স্ট্যাটাস:', key: 'STATUS', id: 'userStatus'}
+    ];
+    
+    fields.forEach(field => {
+        const row = document.createElement('div');
+        row.className = 'detail-row';
+        
+        const label = document.createElement('div');
+        label.className = 'detail-label';
+        label.textContent = field.label;
+        
+        const valueContainer = document.createElement('div');
+        valueContainer.className = 'value-container';
+        
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'detail-value';
+        valueSpan.textContent = field.value || user[field.key] || 'N/A';
+        
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.innerHTML = '<i class="far fa-copy"></i>';
+        copyBtn.onclick = (e) => {
+            e.stopPropagation();
+            copyToClipboard(field.value || user[field.key] || 'N/A');
+        };
+        
+        valueContainer.append(valueSpan, copyBtn);
+        row.append(label, valueContainer);
+        detailsContainer.appendChild(row);
+    });
+    
+    popup.style.display = 'block';
+    setTimeout(() => {
+        popup.classList.add('show');
+        overlay.classList.add('show');
+    }, 10);
+    
+    document.body.style.overflow = 'hidden';
+}
+
+function closePopup() {
+    const popup = document.getElementById('detailsContainer');
+    const overlay = document.getElementById('overlay');
+    
+    popup.classList.remove('show');
+    overlay.classList.remove('show');
+    
+    setTimeout(() => {
+        popup.style.display = 'none';
+        currentPopupUser = null;
+        document.body.style.overflow = 'auto';
+    }, 300);
+}
+
+// ইউটিলিটি ফাংশনসমূহ
+function getPhotoUrl(username) {
+    return username ? 
+        `https://raw.githubusercontent.com/masud673/masud/main/img/${encodeURIComponent(username)}.png` : 
+        'https://via.placeholder.com/150?text=User';
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text)
+        .then(() => showCopyNotification())
+        .catch(err => console.error('কপি ব্যর্থ:', err));
+}
+
+function showCopyNotification() {
+    const notification = document.getElementById('copyNotification');
+    notification.classList.add('show');
+    setTimeout(() => notification.classList.remove('show'), 2000);
+}
+
+function handleOverlayClick(e) {
+    if (e.target === document.getElementById('overlay')) {
+        closePopup();
+        closeMenu();
+    }
+}
+
+function handleKeyDown(e) {
+    if (e.key === 'Escape') {
+        closePopup();
+        closeMenu();
+    }
+}
+
+function showLoading() {
+    document.getElementById('cardContainer').innerHTML = `
+        <div class="loading-spinner"></div>
+        <div class="loading-text">ডেটা লোড হচ্ছে...</div>
+    `;
+}
+
+function showError(message) {
+    const cardContainer = document.getElementById('cardContainer');
+    cardContainer.innerHTML = `<div class="error-message">${message}</div>`;
+}
+
+function checkNetworkStatus() {
+    if (!navigator.onLine) showError('আপনি অফলাইনে আছেন');
+    window.addEventListener('online', () => {
+        showError('আপনি অনলাইনে ফিরেছেন');
+        setTimeout(loadCSVData, 3000);
+    });
+    window.addEventListener('offline', () => showError('অফলাইন মোড সক্রিয়'));
+}
+
+function handleDataError(error) {
+    if (!navigator.onLine) {
+        showError('অফলাইন মোড: ক্যাশেড ডেটা দেখানো হচ্ছে');
+    } else {
+        showError('ডেটা লোড ব্যর্থ: ' + error.message);
+    }
+}
+
+
+// আপনার মূল স্ক্রিপ্টে শুধুমাত্র লগআউট ইভেন্ট হ্যান্ডলার পরিবর্তন
+document.getElementById('logoutBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  document.getElementById('confirmDialog').style.display = 'flex';
+});
+
+document.getElementById('cancelLogout').addEventListener('click', function() {
+  document.getElementById('confirmDialog').style.display = 'none';
+});
+
+document.getElementById('confirmLogout').addEventListener('click', function() {
+  // আপনার মূল লগআউট লজিক
+  localStorage.removeItem('sessionData');
+  localStorage.removeItem('sessionExpiry');
+  window.location.href = 'index.html';
+});
+
+
+</script>
+</body>
+</html>
