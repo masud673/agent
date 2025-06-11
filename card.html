@@ -808,7 +808,6 @@
     <div id="copyNotification" class="copy-notification">কপি করা হয়েছে!</div>
     
 <script>
-
 // গ্লোবাল ভেরিয়েবল
 let userData = [];
 let additionalData = [];
@@ -824,7 +823,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function initApp() {
-
     // ইভেন্ট লিসেনার সেটআপ
     setupEventListeners();
     
@@ -871,13 +869,11 @@ function closeMenu() {
 async function loadCSVData() {
     try {
         const url = 'https://raw.githubusercontent.com/masud673/masud/main/data.csv';
-
         const response = await fetch(url);
         const csvData = await response.text();
         userData = processCSVData(csvData);
         filteredData = [...userData];
         renderCards();
-
     } catch (error) {
         handleDataError(error);
     }
@@ -906,7 +902,6 @@ function processCSVData(csvData) {
     }
 
     populateDropdown('areaSelect', areaSet, 'সব এলাকা');
-    
     return data;
 }
 
@@ -963,9 +958,7 @@ function filterUsers() {
     renderCards();
 }
 
-
-
-function renderCards() {
+async function renderCards() {
     const cardContainer = document.getElementById('cardContainer');
     cardContainer.innerHTML = '';
     
@@ -979,23 +972,21 @@ function renderCards() {
     const areaSelect = document.getElementById('areaSelect');
     const isAllAreasSelected = areaSelect.value === '';
     
-    paginatedData.forEach((user, index) => {
+    for (let i = 0; i < paginatedData.length; i++) {
+        const user = paginatedData[i];
         const card = document.createElement('div');
         card.className = 'card';
-        card.style.animationDelay = `${index * 0.05}s`;
+        card.style.animationDelay = `${i * 0.05}s`;
         card.onclick = () => showPopup(user);
         
         const username = user['Username'] || 'N/A';
-        const photoUrl = getPhotoUrl(username);
+        const photoUrl = await getPhotoUrl(username);
         
-        // সিরিয়াল নাম্বার লজিক পরিবর্তন
         let serialNumber;
         if (isAllAreasSelected) {
-            // সব এলাকা সিলেক্ট থাকলে মূল ডাটার ইনডেক্স ব্যবহার
             serialNumber = userData.findIndex(u => u['Username'] === user['Username']) + 1;
         } else {
-            // নির্দিষ্ট এলাকা সিলেক্ট থাকলে ফিল্টার্ড ডাটার ইনডেক্স ব্যবহার
-            serialNumber = startIndex + index + 1;
+            serialNumber = startIndex + i + 1;
         }
         
         card.innerHTML = `
@@ -1012,11 +1003,10 @@ function renderCards() {
         `;
         
         cardContainer.appendChild(card);
-    });
+    }
 
     addPaginationControls();
 }
-
 
 function addPaginationControls() {
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -1055,7 +1045,7 @@ function addPaginationControls() {
 }
 
 // পপআপ ফাংশনসমূহ
-function showPopup(user) {
+async function showPopup(user) {
     if (currentPopupUser !== null) return;
     
     currentPopupUser = user;
@@ -1069,7 +1059,7 @@ function showPopup(user) {
         item.USERNAME.toLowerCase() === user.Username.toLowerCase()
     ) || {};
     
-    photoElement.src = getPhotoUrl(user['Username']);
+    photoElement.src = await getPhotoUrl(user['Username']);
     photoElement.onerror = function() {
         this.onerror = null;
         this.src = 'https://via.placeholder.com/150?text=User';
@@ -1143,10 +1133,35 @@ function closePopup() {
 }
 
 // ইউটিলিটি ফাংশনসমূহ
-function getPhotoUrl(username) {
-    return username ? 
-        `https://raw.githubusercontent.com/masud673/masud/main/img/${encodeURIComponent(username)}.png` : 
-        'https://via.placeholder.com/150?text=User';
+async function getPhotoUrl(username) {
+    if (!username) return 'https://via.placeholder.com/150?text=User';
+    
+    const baseUrl = 'https://raw.githubusercontent.com/masud673/masud/main/img/';
+    const encodedUsername = encodeURIComponent(username);
+    const extensions = ['.png', '.jpg', '.jpeg', '.webp'];
+    
+    // সবগুলো এক্সটেনশন চেক করার জন্য
+    for (const ext of extensions) {
+        const imageUrl = `${baseUrl}${encodedUsername}${ext}`;
+        try {
+            const exists = await checkImageExists(imageUrl);
+            if (exists) return imageUrl;
+        } catch (error) {
+            console.error(`Error checking image ${imageUrl}:`, error);
+        }
+    }
+    
+    // কোনো ইমেজ না পাওয়া গেলে ডিফল্ট ইমেজ রিটার্ন করবে
+    return 'https://via.placeholder.com/150?text=User';
+}
+
+async function checkImageExists(url) {
+    try {
+        const response = await fetch(url, { method: 'HEAD' });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
 }
 
 function copyToClipboard(text) {
@@ -1204,25 +1219,22 @@ function handleDataError(error) {
     }
 }
 
-
-// আপনার মূল স্ক্রিপ্টে শুধুমাত্র লগআউট ইভেন্ট হ্যান্ডলার পরিবর্তন
+// লগআউট ইভেন্ট হ্যান্ডলার
 document.getElementById('logoutBtn').addEventListener('click', function(e) {
-  e.preventDefault();
-  document.getElementById('confirmDialog').style.display = 'flex';
+    e.preventDefault();
+    document.getElementById('confirmDialog').style.display = 'flex';
 });
 
 document.getElementById('cancelLogout').addEventListener('click', function() {
-  document.getElementById('confirmDialog').style.display = 'none';
+    document.getElementById('confirmDialog').style.display = 'none';
 });
 
 document.getElementById('confirmLogout').addEventListener('click', function() {
-  // আপনার মূল লগআউট লজিক
-  localStorage.removeItem('sessionData');
-  localStorage.removeItem('sessionExpiry');
-  window.location.href = 'index.html';
+    localStorage.removeItem('sessionData');
+    localStorage.removeItem('sessionExpiry');
+    window.location.href = 'index.html';
 });
-
-
 </script>
+
 </body>
 </html>
