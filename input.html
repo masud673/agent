@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MASUD TELECOM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --error-color: #e74c3c;
+            --dark-bg: #0d0d0d;
+            --card-bg: #1f1f1f;
+            --text-color: #e0e0e0;
+            --text-muted: rgba(224, 224, 224, 0.7);
+            --menu-bg: rgba(40, 40, 40, 0.95);
+            --header-bg: #1a1a1a;
+            --border-color: #333;
+            --side-margin: 16px;
+        }
+
+        /* ========== বডি স্টাইল ========== */
+        body {
+            font-family: 'Noto Sans Bengali', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ========== হেডার ========== */
+        .header {
+            background-color: var(--header-bg);
+            padding: 12px var(--side-margin);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        .menu-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .menu-icon {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-right: 12px;
+        }
+
+        .menu-icon:hover {
+            background-color: #2980b9;
+            transform: rotate(90deg);
+        }
+
+        .menu-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-color);
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        /* ========== সাইডবার মেনু ========== */
+        #menuBar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background-color: var(--menu-bg);
+            transition: left 0.3s ease;
+            z-index: 1001;
+            padding-top: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        #menuBar.open {
+            left: 0;
+        }
+
+        #menuBar a {
+            display: block;
+            color: var(--text-color);
+            padding: 14px 20px;
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        #menuBar a:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: var(--primary-color);
+            padding-left: 25px;
+        }
+
+        #closeBtn {
+            color: var(--text-color);
+            font-size: 22px;
+            text-align: right;
+            padding: 12px 20px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        #closeBtn:hover {
+            color: var(--primary-color);
+        }
+
+        /* ========== ওভারলে ========== */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            display: none;
+        }
+
+        #overlay.show {
+            display: block;
+        }
+
+        /* ========== ফর্ম কন্টেইনার ========== */
+        #userForm {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: calc(100% - 2 * var(--side-margin));
+            max-width: 500px;
+            margin: 80px var(--side-margin) 20px;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        #userForm label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        #userForm input,
+        #userForm select {
+            width: calc(100% - 24px);
+            padding: 10px 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 15px;
+            display: block;
+            background-color: rgba(255,255,255,0.05);
+            color: var(--text-color);
+            transition: all 0.3s;
+        }
+
+        #userForm input:focus,
+        #userForm select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52,152,219,0.2);
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        #userForm .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+
+        #userForm .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .result-container {
+            width: calc(100% - 2 * var(--side-margin));
+            max-width: 500px;
+            margin: 20px var(--side-margin);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .result-item {
+            margin: 10px 0;
+            padding: 14px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            word-wrap: break-word;
+            white-space: normal;
+            transition: all 0.3s;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .result-item:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* রেস্পন্সিভ স্টাইল */
+        @media (min-width: 768px) {
+            :root {
+                --side-margin: 24px;
+            }
+            
+            #userForm {
+                margin: 100px auto 20px;
+                padding: 25px;
+            }
+            
+            .result-container {
+                margin: 20px auto;
+            }
+            
+            #menuBar {
+                left: -320px;
+                width: 320px;
+            }
+            
+            .menu-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .menu-name {
+                font-size: 20px;
+            }
+            
+            #userForm label {
+                font-size: 15px;
+            }
+            
+            #userForm input,
+            #userForm select {
+                font-size: 16px;
+                padding: 12px;
+            }
+            
+            .result-item {
+                font-size: 15px;
+                padding: 16px;
+            }
+        }
+
+        /* আনিমেশন */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-item {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== হেডার ========== -->
+    <div class="header">
+        <div class="menu-container">
+            <div class="menu-icon" id="menuIcon">&#9776;</div>
+            <span class="menu-name">MASUD TELECOM</span>
+        </div>
+    </div>
+
+    <!-- ========== সাইডবার মেনু ========== -->
+    <div id="menuBar">
+        <div id="closeBtn">&#10006;</div>
+        <a href="index.html">Dashboard</a>
+        <a href="package.html">Package</a>
+        <a href="leser.html">Pon Calculator</a>
+        <a href="input.html">Input</a>
+        <a href="#">Logout</a>
+    </div>
+
+    <!-- ========== ওভারলে ========== -->
+    <div id="overlay"></div>
+
+    <!-- ========== ইউজার ফর্ম ========== -->
+    <form id="userForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="phone">Phone:</label>
+        <input type="tel" id="phone" name="phone" value="+88" required>
+
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id">
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" list="addressSuggestions" required>
+        <datalist id="addressSuggestions">
+            <option value="Chadra">
+            <option value="Satbaria">
+            <option value="Begumpur">
+            <option value="Hazrakathi">
+            <option value="Koriakhali">
+        </datalist>
+
+        <label for="pon">PON:</label>
+        <input type="text" id="pon" name="pon" required>
+
+        <label for="mac">MAC Address:</label>
+        <input type="text" id="mac" name="mac" placeholder="00:00:00:00:00:00">
+
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+        </select>
+
+        <button type="submit" class="btn">Submit</button>
+    </form>
+
+    <div class="result-container" id="resultContainer"></div>
+
+    <script>
+        // ডকুমেন্ট রেডি
+        document.addEventListener('DOMContentLoaded', function() {
+            // মেনু বার টগল
+            document.getElementById('menuIcon').addEventListener('click', toggleMenu);
+            
+            // সাইডবার বন্ধ করার জন্য ক্লোজ বাটন
+            document.getElementById('closeBtn').addEventListener('click', toggleMenu);
+            
+            // ওভারলে ক্লিক
+            document.getElementById('overlay').addEventListener('click', toggleMenu);
+
+            // ফর্ম সাবমিট ইভেন্ট
+            const form = document.getElementById('userForm');
+            if (form) {
+                form.addEventListener('submit', handleFormSubmit);
+            }
+        });
+
+        // মেনু টগল ফাংশন
+        function toggleMenu() {
+            const menuBar = document.getElementById('menuBar');
+            const overlay = document.getElementById('overlay');
+            
+            menuBar.classList.toggle('open');
+            overlay.classList.toggle('show');
+            document.body.style.overflow = menuBar.classList.contains('open') ? 'hidden' : 'auto';
+        }
+
+        // 📌 MAC Address ফরম্যাট ঠিক করার ফাংশন
+        function formatMacAddress(mac) {
+            if (!mac) return '00:00:00:00:00:00';
+            if (mac.includes(":")) return mac.toUpperCase(); // যদি ":" থাকে, uppercase করে রিটার্ন
+
+            mac = mac.replace(/[^a-fA-F0-9]/g, '').toUpperCase(); // শুধুমাত্র HEX সংখ্যা নেবে
+            mac = mac.padStart(12, '0'); // ১২ ডিজিট নিশ্চিত করবে
+            return mac.match(/.{1,2}/g).join(':'); // প্রতি ২ অক্ষরের পর ":" বসাবে
+        }
+
+        // 📌 ফর্ম সাবমিট হ্যান্ডলার
+        function handleFormSubmit(e) {
+            e.preventDefault(); // ফর্ম সাবমিট আটকানো
+
+            // ইনপুট ভ্যালু কালেক্ট করা
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const id = document.getElementById('id').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const pon = document.getElementById('pon').value.trim();
+            let mac = document.getElementById('mac').value.trim();
+            const status = document.getElementById('status').value.trim();
+
+            // MAC Address ফরম্যাটিং করবো
+            mac = formatMacAddress(mac);
+
+            // ইউজারনেম জেনারেট করা
+            const nameParts = name.split(" ");
+            let lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : nameParts[0];
+            const lastTwoDigitsOfPhone = phone.slice(-2);
+            const username = `${lastName.toLowerCase()}${lastTwoDigitsOfPhone}@bp`;
+
+            // রেজাল্ট তৈরি করা
+            const resultText = `${name},${phone},${id},${address},${username},${pon},${mac},${status}`;
+
+            // রেজাল্ট দেখানোর জন্য নতুন `div` তৈরি
+            const resultDiv = document.createElement('div');
+            resultDiv.classList.add('result-item');
+            resultDiv.textContent = resultText;
+
+            // ক্লিক করলে কপি হবে
+            resultDiv.addEventListener('click', function() {
+                navigator.clipboard.writeText(resultText).then(() => {
+                    // টেম্পোরারি স্টাইল চেঞ্জ
+                    const originalText = resultDiv.textContent;
+                    resultDiv.textContent = 'কপি করা হয়েছে! ✓';
+                    resultDiv.style.backgroundColor = 'var(--secondary-color)';
+                    resultDiv.style.color = '#fff';
+                    
+                    setTimeout(() => {
+                        resultDiv.textContent = originalText;
+                        resultDiv.style.backgroundColor = '';
+                        resultDiv.style.color = '';
+                    }, 1500);
+                }).catch(err => {
+                    alert('Failed to copy text: ' + err);
+                });
+            });
+
+            // রেজাল্ট দেখানো
+            const resultContainer = document.getElementById('resultContainer');
+            resultContainer.insertBefore(resultDiv, resultContainer.firstChild);
+
+            // ফর্ম রিসেট করা
+            e.target.reset();
+            document.getElementById('phone').value = '+88';
+        }
+    </script>
+</body>
+</html>
