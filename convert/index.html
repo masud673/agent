@@ -519,9 +519,9 @@
         document.getElementById('demo-btn').addEventListener('click', function() {
             // ডেমো ডেটা তৈরি
             const demoData = [
-                ["ppoe user", "ppoe password", "নাম", "ফোন নম্বর", "মেয়াদ শেষের তারিখ"],
-                ["user1@bp", "pass123", "জহির রায়হান", "1712345678", "30-12-2025"],
-                ["user2@bp", "pass456", "আনিসুল হক", "1812345678", "31-12-2025"]
+                ["ppoe user", "ppoe password", "Name", "Phone Number", "expire date"],
+                ["user1", "pass123", "demo1", "1712345678", "30-12-2025"],
+                ["user2", "pass456", "demo2", "1812345678", "31-12-2025"]
             ];
             
             // এক্সেল ওয়ার্কবুক তৈরি
@@ -537,7 +537,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'ডেমো_ফরম্যাট.xlsx';
+            a.download = 'demo_format.xlsx';
             document.body.appendChild(a);
             a.click();
             setTimeout(() => {
