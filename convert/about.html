@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>যোগাযোগ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            text-align: center;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 450px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 4px solid #4361ee;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #4361ee;
+        }
+
+        .info {
+            margin: 15px 0;
+            font-size: 16px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #333333;
+        }
+
+        .info a {
+            color: #4361ee;
+            text-decoration: none;
+        }
+
+        .info a:hover {
+            text-decoration: underline;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            margin: 8px;
+            border-radius: 8px;
+            background-color: #4361ee;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #3a56d4;
+        }
+
+        .button.facebook {
+            background-color: #1877F2;
+        }
+
+        .button.whatsapp {
+            background-color: #25D366;
+        }
+
+        .button.email {
+            background-color: #EA4335;
+        }
+
+        .button.call {
+            background-color: #7209b7;
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 25px;
+            gap: 10px;
+        }
+
+        .contact-form {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .contact-form h2 {
+            color: #4361ee;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+        }
+
+        .contact-form button {
+            background-color: #4361ee;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 500;
+        }
+
+        .contact-form button:hover {
+            background-color: #3a56d4;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                width: 90%;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .info {
+                font-size: 14px;
+            }
+            
+            .button {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+            
+            .profile-image {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="mp/myp.jpg" alt="প্রোফাইল ছবি" class="profile-image" onerror="this.src='https://via.placeholder.com/150'">
+        <h1>MASUD RANA</h1>
+        <div class="info">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>ঠিকানা: বেগমপুর বাজার, কেশবপুর, যশোর</span>
+        </div>
+        <div class="info">
+            <i class="fas fa-mobile-alt"></i>
+            <a href="tel:01766732673">01766-732673</a>
+        </div>
+        <div class="info">
+            <i class="fas fa-phone-alt"></i>
+            <a href="tel:09696732673">09696-732673</a>
+        </div>
+        <div class="info">
+            <i class="fas fa-envelope"></i>
+            <a href="mailto:masud6019@gmail.com">masud6019@gmail.com</a>
+        </div>
+        
+        <div class="button-container">
+            <a href="https://facebook.com/yourprofile" class="button facebook">
+                <i class="fab fa-facebook-f"></i> FACEBOOK
+            </a>
+            <a href="https://wa.me/8801766732673" class="button whatsapp">
+                <i class="fab fa-whatsapp"></i> WHATSAPP
+            </a>
+            <a href="mailto:masud6019@gmail.com" class="button email">
+                <i class="fas fa-envelope"></i> EMAIL
+            </a>
+            <a href="tel:01766732673" class="button call">
+                <i class="fas fa-phone"></i> CALL NOW
+            </a>
+        </div>
+
+        <div class="contact-form">
+            <h2>বার্তা পাঠান</h2>
+            <form id="contactForm">
+                <input type="text" placeholder="আপনার নাম" required>
+                <input type="email" placeholder="ইমেইল ঠিকানা" required>
+                <textarea placeholder="আপনার বার্তা" rows="4" required></textarea>
+                <button type="submit">পাঠান</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('.profile-image').addEventListener('error', function() {
+            this.src = 'https://via.placeholder.com/150';
+        });
+
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('আপনার বার্তা সফলভাবে জমা হয়েছে!');
+            this.reset();
+        });
+    </script>
+</body>
+</html>

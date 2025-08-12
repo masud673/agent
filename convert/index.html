@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>এক্সেল থেকে CSV কনভার্টার | YetFix ফরম্যাট</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+        :root {
+            --primary: #4a6bff;
+            --secondary: #3a56d4;
+            --accent: #5c8aff;
+            --light: #f8faff;
+            --dark: #2d3748;
+            --success: #4ade80;
+            --warning: #f87171;
+            --border: #e2e8f0;
+            --text: #1a202c;
+            --bg: #f7fafc;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Nirmala UI', 'Kalpurush', sans-serif;
+        }
+        
+        body {
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            padding: 10px;
+            direction: ltr;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: var(--dark);
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        .converter-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.85rem;
+        }
+        
+        .required-field::after {
+            content: " *";
+            color: var(--warning);
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(74, 107, 255, 0.15);
+            outline: none;
+        }
+        
+        .file-upload {
+            margin-top: 20px;
+        }
+        
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            background: var(--light);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            flex-direction: column;
+        }
+        
+        .file-upload-label:hover {
+            border-color: var(--primary);
+            background: rgba(74, 107, 255, 0.05);
+        }
+        
+        .file-upload-icon {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .file-upload-text {
+            font-weight: 500;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+        
+        .file-upload-hint {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        
+        .file-name {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        #xlsx_file {
+            display: none;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(74, 107, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(74, 107, 255, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background-color: var(--light);
+            color: var(--primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background-color: white;
+            border-color: var(--primary);
+        }
+        
+        .btn-icon {
+            margin-right: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(74, 107, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .success-icon {
+            color: var(--success);
+            font-size: 1.3rem;
+            margin-right: 8px;
+        }
+        
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .preview-container {
+            margin-top: 15px;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+            max-width: 100%;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+        
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        
+        .preview-table th, 
+        .preview-table td {
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+        
+        .preview-table th {
+            background-color: var(--light);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .preview-table tr:nth-child(even) {
+            background-color: rgba(0,0,0,0.02);
+        }
+        
+        .preview-table tr:hover {
+            background-color: rgba(74, 107, 255, 0.05);
+        }
+        
+        .preview-note {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-align: center;
+            margin-top: 8px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+        
+        .creator {
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .container {
+                padding: 8px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .converter-card {
+                padding: 15px;
+            }
+            
+            input[type="text"] {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+            }
+            
+            .file-upload-label {
+                padding: 15px;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .preview-table th, 
+            .preview-table td {
+                padding: 6px 8px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>YetFix User Format</h1>
+            <p class="subtitle">Convert XLSX to CSV in YetFix required format</p>
+        </header>
+        <div class="converter-card">
+            <form id="converter-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="package_name" class="required-field">Package Name</label>
+                        <input type="text" id="package_name" required placeholder="প্যাকেজের নাম লিখুন">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reseller_name">Reseller Name</label>
+                        <input type="text" id="reseller_name" placeholder="রিসেলারের নাম লিখুন">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="zone_pop" class="required-field">Zone/Pop</label>
+                        <input type="text" id="zone_pop" required placeholder="জোন বা পপ লিখুন">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="area" class="required-field" > Area</label>
+                        <input type="text" id="area" placeholder="এলাকা লিখুন">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="division" class="required-field">Division</label>
+                        <input type="text" id="division" required placeholder="বিভাগ লিখুন">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="district" class="required-field">District</label>
+                        <input type="text" id="district" required placeholder="জেলা লিখুন">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="upazila" class="required-field">Upazila</label>
+                        <input type="text" id="upazila" required placeholder="উপজেলা লিখুন">
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button type="button" id="demo-btn" class="btn btn-secondary">
+                        <i class="fas fa-download btn-icon"></i> Download Demo
+                    </button>
+                </div>
+                <div class="file-upload">
+                    <label for="xlsx_file" class="file-upload-label">
+                        <div class="file-upload-icon">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <div class="file-upload-text">এক্সেল ফাইল নির্বাচন করুন</div>
+                        <div class="file-upload-hint">অথবা ফাইলটি এখানে ড্রপ করুন</div>
+                        <div class="file-name" id="file-name-display">কোন ফাইল নির্বাচন করা হয়নি</div>
+                    </label>
+                    <input type="file" id="xlsx_file" accept=".xlsx" required>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="button" id="convert-btn" class="btn btn-primary">
+                        <i class="fas fa-exchange-alt btn-icon"></i> Convert to CSV
+                    </button>
+                </div>
+                
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>আপনার ফাইল প্রসেস করা হচ্ছে...</p>
+                </div>
+            </form>
+        </div>
+        
+        <div id="result" class="result-card">
+            <div class="result-header">
+                <i class="fas fa-check-circle success-icon"></i>
+                <h2 class="result-title">রূপান্তর সম্পূর্ণ!</h2>
+            </div>
+            <p>আপনার CSV ফাইল ডাউনলোডের জন্য প্রস্তুত। প্রথম কয়েকটি সারির প্রিভিউ:</p>
+            
+            <div class="preview-container">
+                <div class="table-responsive">
+                    <table id="csv-preview-table" class="preview-table">
+                        <!-- প্রিভিউ এখানে দেখানো হবে -->
+                    </table>
+                </div>
+                <p id="preview-note" class="preview-note"></p>
+            </div>
+            
+            <div class="action-buttons" style="margin-top: 25px;">
+                <button id="download-btn" class="btn btn-primary">
+                    <i class="fas fa-download btn-icon"></i> CSV ডাউনলোড করুন
+                </button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Created by 
+                <a href="about.html" class="creator" style="text-decoration: none; color: inherit;">
+                    Masud Rana
+                </a> 
+                | © 2025 All Rights Reserved
+            </p>
+    </div>
+
+
+
+
+
+    <script>
+        // ফাংশন: স্পেস মুছে ফেলা
+        function removeSpaces(str) {
+            return str ? String(str).replace(/\s+/g, '') : '';
+        }
+
+        // ফাংশন: ফোন নম্বর ফরম্যাট করা (১১ ডিজিট)
+        function formatPhoneNumber(phone) {
+            if (!phone) return '';
+            
+            let digits = String(phone).replace(/\D/g, '');
+            
+            if (digits.length === 11 && digits.startsWith('0')) {
+                return digits;
+            }
+            
+            if (digits.length === 10) {
+                return '0' + digits;
+            }
+            
+            return digits;
+        }
+
+        // ফাইল নির্বাচন করলে নাম দেখানো
+        document.getElementById('xlsx_file').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'কোন ফাইল নির্বাচন করা হয়নি';
+            document.getElementById('file-name-display').textContent = fileName;
+        });
+
+        // ডেমো এক্সেল ফাইল ডাউনলোড
+        document.getElementById('demo-btn').addEventListener('click', function() {
+            // ডেমো ডেটা তৈরি
+            const demoData = [
+                ["ppoe user", "ppoe password", "নাম", "ফোন নম্বর", "মেয়াদ শেষের তারিখ"],
+                ["user1@bp", "pass123", "জহির রায়হান", "1712345678", "30-12-2025"],
+                ["user2@bp", "pass456", "আনিসুল হক", "1812345678", "31-12-2025"]
+            ];
+            
+            // এক্সেল ওয়ার্কবুক তৈরি
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(demoData);
+            XLSX.utils.book_append_sheet(wb, ws, "ব্যবহারকারীরা");
+            
+            // এক্সেল ফাইল জেনারেট
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            
+            // ডাউনলোড
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ডেমো_ফরম্যাট.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 0);
+        });
+
+        // CSV প্রিভিউ দেখানোর ফাংশন
+        function showCSVPreview(jsonData) {
+            const previewTable = document.getElementById('csv-preview-table');
+            const previewNote = document.getElementById('preview-note');
+            
+            // আগের প্রিভিউ ক্লিয়ার
+            previewTable.innerHTML = '';
+            
+            // হেডার সারি তৈরি
+            const headerRow = document.createElement('tr');
+            if (jsonData.length > 0) {
+                jsonData[0].forEach((header, index) => {
+                    const th = document.createElement('th');
+                    th.textContent = header || `কলাম ${index+1}`;
+                    headerRow.appendChild(th);
+                });
+                previewTable.appendChild(headerRow);
+            }
+            
+            // ডেটা সারি তৈরি (সর্বোচ্চ ১০টি সারি প্রিভিউতে দেখানো হবে)
+            const previewRows = Math.min(10, jsonData.length);
+            for (let i = 1; i < previewRows; i++) {
+                const row = document.createElement('tr');
+                jsonData[i].forEach(cell => {
+                    const td = document.createElement('td');
+                    td.textContent = cell || '';
+                    row.appendChild(td);
+                });
+                previewTable.appendChild(row);
+            }
+            
+            // প্রিভিউ নোট
+            if (jsonData.length > previewRows) {
+                previewNote.textContent = `প্রথম ${previewRows-1}টি সারি দেখানো হচ্ছে (মোট ${jsonData.length-1}টি সারি)`;
+            } else {
+                previewNote.textContent = `মোট ${jsonData.length-1}টি সারি`;
+            }
+        }
+
+        // কনভার্ট বাটনে ক্লিক ইভেন্ট
+        document.getElementById('convert-btn').addEventListener('click', function() {
+            // প্রয়োজনীয় ফিল্ড ভ্যালিডেশন
+            const requiredFields = ['package_name', 'zone_pop', 'division', 'district', 'upazila'];
+            const missingFields = [];
+            
+            requiredFields.forEach(id => {
+                if (!document.getElementById(id).value.trim()) {
+                    const fieldName = document.querySelector(`label[for="${id}"]`).textContent.replace(' *', '');
+                    missingFields.push(fieldName);
+                }
+            });
+            
+            if (missingFields.length > 0) {
+                alert('অনুগ্রহ করে নিম্নলিখিত প্রয়োজনীয় ফিল্ডগুলি পূরণ করুন:\n' + missingFields.join(', '));
+                return;
+            }
+            
+            // ফাইল ভ্যালিডেশন
+            const fileInput = document.getElementById('xlsx_file');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('এক্সেল ফাইল নির্বাচন করুন');
+                return;
+            }
+            
+            // লোডিং স্টেট দেখানো
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('convert-btn').disabled = true;
+            
+            // ফর্ম ভ্যালু সংগ্রহ
+            const packageName = document.getElementById('package_name').value || 'N/A';
+            const resellerName = document.getElementById('reseller_name').value || 'N/A';
+            const zonePop = document.getElementById('zone_pop').value || 'N/A';
+            const area = document.getElementById('area').value || 'N/A';
+            const division = document.getElementById('division').value || 'N/A';
+            const district = document.getElementById('district').value || 'N/A';
+            const upazila = document.getElementById('upazila').value || 'N/A';
+            
+            const file = fileInput.files[0];
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                setTimeout(() => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        
+                        if (!workbook.SheetNames.length) {
+                            throw new Error('এক্সেল ফাইলে কোন শীট পাওয়া যায়নি');
+                        }
+                        
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                        
+                        // CSV ডেটা প্রস্তুত
+                        const csvData = [];
+                        
+                        // CSV হেডার যোগ
+                        csvData.push([
+                            '"ppoe user*"', '"ppoe password*"', '"Name*"', '"Phone No"',
+                            '"Packege Name*"', '"Reseller Name"', '"Zone/Pop*"', '"Billing Cycle*"',
+                            '"Email"', '"Father\'s Name"', '"Mother\'s Name"', '"Area"',
+                            '"Mikrotik Comment"', '"Joining Date"', '"Cable Type"', '"expire date"',
+                            '"customer code"', '"Division*"', '"District*"', '"Upazila*"'
+                        ].join(','));
+                        
+                        // প্রতিটি সারি প্রসেসিং
+                        for (let i = 1; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            if (!row || row.length === 0) continue;
+                            
+                            // মেয়াদ শেষের তারিখ প্রসেসিং
+                            let expireDate = '';
+                            let billingCycle = '';
+                            
+                            if (row[4] !== undefined && row[4] !== null) {
+                                if (row[4] instanceof Date) {
+                                    const day = String(row[4].getDate()).padStart(2, '0');
+                                    const month = String(row[4].getMonth() + 1).padStart(2, '0');
+                                    const year = row[4].getFullYear();
+                                    expireDate = `${day}-${month}-${year}`;
+                                    billingCycle = day;
+                                } else {
+                                    const dateStr = String(row[4]).trim();
+                                    if (dateStr) {
+                                        expireDate = dateStr.replace(/\//g, '-');
+                                        const dayPart = expireDate.split('-')[0];
+                                        if (dayPart) {
+                                            billingCycle = dayPart.replace(/[^0-9]/g, '');
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // ইউজারনেম, পাসওয়ার্ড এবং ফোন নম্বর প্রসেসিং
+                            const username = removeSpaces(row[0]);
+                            const password = removeSpaces(row[1]);
+                            const phoneNumber = formatPhoneNumber(row[3]);
+                            
+                            // CSV সারি তৈরি
+                            const csvRow = [
+                                `"${username}"`, `"${password}"`, `"${row[2] || ''}"`,
+                                `"${phoneNumber}"`, `"${packageName}"`, `"${resellerName}"`,
+                                `"${zonePop}"`, `"${billingCycle}"`, '"N/A"', '"N/A"',
+                                '"N/A"', `"${area}"`, '""', '""', '""', `"${expireDate}"`,
+                                '""', `"${division}"`, `"${district}"`, `"${upazila}"`
+                            ].join(',');
+                            
+                            csvData.push(csvRow);
+                        }
+                        
+                        // CSV কন্টেন্ট তৈরি
+                        const csvContent = csvData.join('\n');
+                        
+                        // প্রিভিউ দেখানো
+                        showCSVPreview(jsonData);
+                        
+                        // রেজাল্ট কার্ড দেখানো
+                        document.getElementById('result').style.display = 'block';
+                        
+                        // ডাউনলোড বাটন সেটআপ
+                        document.getElementById('download-btn').onclick = function() {
+                            const reseller = document.getElementById('reseller_name').value.trim() || 'ব্যবহারকারীরা';
+                            const today = new Date();
+                            const dateStr = [
+                                today.getFullYear(),
+                                String(today.getMonth() + 1).padStart(2, '0'),
+                                String(today.getDate()).padStart(2, '0')
+                            ].join('');
+                            
+                            const filename = `${reseller.replace(/\s+/g, '_')}_${dateStr}.csv`;
+                            
+                            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = filename;
+                            document.body.appendChild(a);
+                            a.click();
+                            setTimeout(() => {
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
+                            }, 100);
+                        };
+                        
+                    } catch (error) {
+                        alert('ফাইল প্রসেস করতে সমস্যা হয়েছে: ' + error.message);
+                        console.error(error);
+                    } finally {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('convert-btn').disabled = false;
+                    }
+                }, 800);
+            };
+            reader.readAsArrayBuffer(file);
+        });
+    </script>
+</body>
+</html>
