@@ -154,7 +154,7 @@ document.getElementById('demo-btn').addEventListener('click', ()=>{
     setTimeout(()=>{document.body.removeChild(a); URL.revokeObjectURL(url);},0);  
 });  
   
-// তারিখ ফরম্যাট (DD/MM/YYYY)
+// এক্সেল তারিখ যেভাবে আছে ঠিক সেভাবে DD/MM/YYYY বানাবে
 function formatDate(value){
     if(!value) return "";
     if(value instanceof Date)
@@ -163,9 +163,8 @@ function formatDate(value){
         const d = XLSX.SSF.parse_date_code(value);
         return `${String(d.d).padStart(2,'0')}/${String(d.m).padStart(2,'0')}/${d.y}`;
     }
-    // যদি স্ট্রিং হয় তবে / দিয়ে রিপ্লেস করে দেবে
-    return value.toString().replace(/-/g,'/'); 
-}  
+    return value.toString(); // এক্সেল যদি স্ট্রিং হয় সেটাই ফিরিয়ে দেবে
+}
 // ফোন নম্বর ফরম্যাট  
 function formatPhone(phone){  
     if(!phone) return '';  
