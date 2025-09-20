@@ -7,7 +7,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* আগের সব স্টাইল আপনার মতই রাখা হয়েছে */
 :root { --primary:#4a6bff;--secondary:#3a56d4;--accent:#5c8aff;--light:#f8faff;--dark:#2d3748;--success:#4ade80;--warning:#f87171;--border:#e2e8f0;--text:#1a202c;--bg:#f7fafc; }
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI','Nirmala UI','Kalpurush',sans-serif;}
 body{line-height:1.6;color:var(--text);background-color:var(--bg);padding:10px;}
@@ -65,6 +64,7 @@ input[type="text"]:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(7
 <h1>YetFix User Format</h1>
 <p class="subtitle">Convert XLSX to CSV in YetFix required format</p>
 </header>
+
 <div class="converter-card">
 <form id="converter-form">
 <div class="form-grid">
@@ -76,7 +76,9 @@ input[type="text"]:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(7
 <div class="form-group"><label for="district" class="required-field">District</label><input type="text" id="district" required placeholder="জেলা লিখুন"></div>
 <div class="form-group"><label for="upazila" class="required-field">Upazila</label><input type="text" id="upazila" required placeholder="উপজেলা লিখুন"></div>
 </div>
+
 <div class="action-buttons"><button type="button" id="demo-btn" class="btn btn-secondary"><i class="fas fa-download btn-icon"></i> Download Demo</button></div>
+
 <div class="file-upload">
 <label for="xlsx_file" class="file-upload-label">
 <div class="file-upload-icon"><i class="fas fa-file-excel"></i></div>
@@ -86,6 +88,7 @@ input[type="text"]:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(7
 </label>
 <input type="file" id="xlsx_file" accept=".xlsx" required>
 </div>
+
 <div class="action-buttons">
     <button type="button" id="convert-btn" class="btn btn-primary">
         <i class="fas fa-exchange-alt btn-icon"></i> Convert to CSV
@@ -121,133 +124,118 @@ input[type="text"]:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(7
 </div>
 
 <script>
-const xlsxFile = document.getElementById('xlsx_file');
-const fileNameDisplay = document.getElementById('file-name-display');
-xlsxFile.addEventListener('change', e=>{
-    const fileName = e.target.files[0] ? e.target.files[0].name : 'কোন ফাইল নির্বাচন করা হয়নি';
-    fileNameDisplay.textContent = fileName;
-});
+const xlsxFile = document.getElementById('xlsx_file');  
+const fileNameDisplay = document.getElementById('file-name-display');  
 
-// তারিখ ফরম্যাট
-function formatDate(value){
-    if(!value) return "";
-    if(!isNaN(value)) {
-        const d = XLSX.SSF.parse_date_code(value);
-        return `${String(d.d).padStart(2,'0')}-${String(d.m).padStart(2,'0')}-${d.y}`;
-    }
-    return value.toString();
-}
-// ফোন ফরম্যাট
-function formatPhone(phone){
-    if(!phone) return '';
-    let digits = String(phone).replace(/\D/g,'');
-    if(digits.length===10) digits='0'+digits;
-    return digits;
-}
+xlsxFile.addEventListener('change', e => {  
+    const fileName = e.target.files[0] ? e.target.files[0].name : 'কোন ফাইল নির্বাচন করা হয়নি';  
+    fileNameDisplay.textContent = fileName;  
+});  
 
-// প্রিভিউ
-function showPreview(data){
-    const table = document.getElementById('csv-preview-table');
-    const note = document.getElementById('preview-note');
-    table.innerHTML="";
-    if(data.length>0){
-        const headerRow = document.createElement('tr');
-        data[0].forEach(h=>{
-            const th = document.createElement('th'); th.textContent=h||''; headerRow.appendChild(th);
-        });
-        table.appendChild(headerRow);
-    }
-    const rows = Math.min(10,data.length);
-    for(let i=1;i<rows;i++){
-        const tr=document.createElement('tr');
-        data[i].forEach(c=>{ const td=document.createElement('td'); td.textContent=c||''; tr.appendChild(td); });
-        table.appendChild(tr);
-    }
-    note.textContent=data.length>rows?`প্রথম ${rows-1}টি সারি দেখানো হচ্ছে (মোট ${data.length-1}টি সারি)`:`মোট ${data.length-1}টি সারি`;
-}
+function formatPhone(phone){  
+    if(!phone) return '';  
+    let digits = String(phone).replace(/\D/g,'');  
+    if(digits.length===10) digits='0'+digits;  
+    return digits;  
+}  
 
-// Convert বাটন
-document.getElementById('convert-btn').addEventListener('click', ()=>{
-    const required=['package_name','zone_pop','division','district','upazila'];
-    const missing=[];
-    required.forEach(id=>{
-        if(!document.getElementById(id).value.trim()){
-            missing.push(document.querySelector(`label[for="${id}"]`).textContent.replace(' *',''));
-        }
-    });
-    if(missing.length){ alert('অনুগ্রহ করে পূরণ করুন:\n'+missing.join(', ')); return; }
-    if(!xlsxFile.files.length){ alert('এক্সেল ফাইল নির্বাচন করুন'); return; }
+function showPreview(data){  
+    const table = document.getElementById('csv-preview-table');  
+    const note = document.getElementById('preview-note');  
+    table.innerHTML="";  
+    if(data.length>0){  
+        const headerRow = document.createElement('tr');  
+        data[0].forEach(h=>{ const th = document.createElement('th'); th.textContent=h||''; headerRow.appendChild(th); });  
+        table.appendChild(headerRow);  
+    }  
+    const rows = Math.min(10, data.length);  
+    for(let i=1;i<rows;i++){  
+        const tr=document.createElement('tr');  
+        data[i].forEach(c=>{ const td=document.createElement('td'); td.textContent=c||''; tr.appendChild(td); });  
+        table.appendChild(tr);  
+    }  
+    note.textContent = data.length>rows ? `প্রথম ${rows-1}টি সারি দেখানো হচ্ছে (মোট ${data.length-1}টি সারি)` : `মোট ${data.length-1}টি সারি`;  
+}  
 
-    document.getElementById('loading').style.display='block';
-    document.getElementById('convert-btn').disabled=true;
+document.getElementById('convert-btn').addEventListener('click', ()=>{  
+    const required=['package_name','zone_pop','division','district','upazila'];  
+    const missing=[];  
+    required.forEach(id=>{ if(!document.getElementById(id).value.trim()){ missing.push(document.querySelector(`label[for="${id}"]`).textContent.replace(' *','')); } });  
+    if(missing.length){ alert('অনুগ্রহ করে পূরণ করুন:\n'+missing.join(', ')); return; }  
+    if(!xlsxFile.files.length){ alert('এক্সেল ফাইল নির্বাচন করুন'); return; }  
 
-    const reader = new FileReader();
-    reader.onload = function(e){
-        const data = new Uint8Array(e.target.result);
-        const wb = XLSX.read(data,{type:'array'});
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json(ws,{header:1,raw:false,dateNF:"dd-mm-yyyy"});
+    document.getElementById('loading').style.display='block';  
+    document.getElementById('convert-btn').disabled=true;  
 
-        const packageName=document.getElementById('package_name').value;
-        const resellerName=document.getElementById('reseller_name').value||'N/A';
-        const zonePop=document.getElementById('zone_pop').value;
-        const area=document.getElementById('area').value||'N/A';
-        const division=document.getElementById('division').value;
-        const district=document.getElementById('district').value;
-        const upazila=document.getElementById('upazila').value;
+    const reader = new FileReader();  
+    reader.onload = function(e){  
+        const data = new Uint8Array(e.target.result);  
+        const wb = XLSX.read(data,{type:'array'});  
+        const ws = wb.Sheets[wb.SheetNames[0]];  
+        const jsonData = XLSX.utils.sheet_to_json(ws,{header:1,raw:false});  
 
-        const finalData=[];
-        finalData.push([
-            "ppoe user*","ppoe password*","Name*","Phone No","Packege Name*","Reseller Name","Zone/Pop*","Billing Cycle*",
-            "Email","Father's Name","Mother's Name","Area","Mikrotik Comment","Joining Date","Cable Type","expire date",
-            "customer code","Division*","District*","Upazila*"
-        ]);
+        const packageName=document.getElementById('package_name').value;  
+        const resellerName=document.getElementById('reseller_name').value||'N/A';  
+        const zonePop=document.getElementById('zone_pop').value;  
+        const area=document.getElementById('area').value||'N/A';  
+        const division=document.getElementById('division').value;  
+        const district=document.getElementById('district').value;  
+        const upazila=document.getElementById('upazila').value;  
 
-        for(let i=1;i<jsonData.length;i++){
-            const row=jsonData[i];
-            if(!row||row.length===0) continue;
-            const expire=formatDate(row[4]);
-            const billingCycle=expire?expire.split('-')[0]:''; // শুধু দিন
-            finalData.push([
-                row[0]||'',
-                row[1]||'',
-                row[2]||'',
-                formatPhone(row[3]),
-                packageName,
-                resellerName,
-                zonePop,
-                billingCycle,
-                'N/A','N/A','N/A',
-                area,
-                '',
-                '',
-                '',
-                expire,
-                '',
-                division,
-                district,
-                upazila
-            ]);
-        }
+        const finalData=[];  
+        finalData.push([  
+            "ppoe user*","ppoe password*","Name*","Phone No","Packege Name*","Reseller Name","Zone/Pop*","Expire Date*",
+            "Email","Father's Name","Mother's Name","Area","Mikrotik Comment","Joining Date","Cable Type","expire month*",
+            "customer code","Division*","District*","Upazila*","Building Name","expire year*"  
+        ]);  
 
-        showPreview(finalData);
+        for(let i=1;i<jsonData.length;i++){  
+            const row=jsonData[i];  
+            if(!row||row.length===0) continue;  
+            let expire = row[4] || '';  
+            let expireDay='', expireMonth='', expireYear='';  
+            if(expire){  
+                const parts = expire.split('-');  
+                if(parts.length===3){ expireDay = parts[0]; expireMonth = parts[1]; expireYear = parts[2]; }  
+            }  
 
-        const ws2=XLSX.utils.aoa_to_sheet(finalData);
-        const wb2=XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb2, ws2, "YetFix");
-        const wbout=XLSX.write(wb2,{bookType:'csv',type:'array'});
-        const blob=new Blob([wbout],{type:'text/csv'});
-        const url=URL.createObjectURL(blob);
+            finalData.push([  
+                row[0]||'', row[1]||'', row[2]||'', formatPhone(row[3]), packageName, resellerName, zonePop, expireDay,  
+                'N/A','N/A','N/A', area, '', row[5]||'', row[6]||'', expireMonth, row[7]||'', division, district, upazila, '', expireYear  
+            ]);  
+        }  
 
-        const downloadBtn=document.getElementById('download-btn');
-        downloadBtn.onclick=()=>{ const a=document.createElement('a'); a.href=url; a.download='YetFix_User.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),0); };
+        showPreview(finalData);  
 
-        document.getElementById('loading').style.display='none';
-        document.getElementById('result').style.display='block';
-        document.getElementById('convert-btn').disabled=false;
+        const ws2 = XLSX.utils.aoa_to_sheet(finalData);
+
+        // CSV তৈরি করা এবং প্রতিটি সেলের চারপাশে ডাবল কোট যোগ করা
+        let csvString = XLSX.utils.sheet_to_csv(ws2, {FS:",", RS:"\n"});
+        csvString = csvString.split("\n")
+            .map(row => row.split(",")
+                .map(cell => `"${String(cell).replace(/[\r\n]+/g,'').trim()}"`)
+                .join(","))
+            .join("\r\n");  // Windows-সাপোর্টেড নতুন লাইন
+
+        const blob = new Blob([csvString], {type:'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+
+        const downloadBtn = document.getElementById('download-btn');
+        downloadBtn.onclick = () => {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'YetFix_User.csv';
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        };
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('convert-btn').disabled = false;
     };
+
     reader.readAsArrayBuffer(xlsxFile.files[0]);
 });
 </script>
-</body>
+</body>  
 </html>
